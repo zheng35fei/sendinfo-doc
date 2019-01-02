@@ -1,10 +1,10 @@
 ## 配置文件 config
 
 ### 环境参数配置文件
-项目接口地址、网关、环境、项目名称等配置   
 /config/dev.env.js  
 /config/prod.env.js  
-/config/test.env.js  
+/config/test.env.js：  
+根据不同环境，写入项目接口地址、网关、环境、名称等配置   
 
 ```js
 {
@@ -21,7 +21,45 @@
 }
 ```
 
+### 在页面代码中使用环境变量
+webpack.xxx.conf.js:
+```js
+plugins: [
+    new webpack.DefinePlugin({
+      'process.env': require('../config/dev.env')
+    }),
+]
+```
+?> webpack.DefinePlugin 将对应场景的配置加入到`process.env`中。你可以在应用的代码中这样访问它们：
+
+```js
+
+created() {
+    console.log('process.env', process.env)
+}
+// result：
+/*
+{
+   BASE_URL: "http://sendinfo-cs-java.tpddns.cn:12222"
+   DEFAULT_GATEWAY: "admin"
+   NODE_ENV: "development"
+   PROJECT_NAME: "电商平台"
+   website: ()=> {…}
+   __proto__: Object
+}
+*/
+   
+```
+
+
 ### webpack基础配置 /config/index.js:
+!> 配置中可以设置转发请求来解决开发中的接口跨域问题；  
+也可以修改接口，允许跨域请求的方式解决；
+
+?> 跨域复杂请求先发起一个options请求，返回200会再发起一个正常的请求
+![跨域请求接口](/imgs/options.png ':size=518x189')
+
+/config/index.js:
 ```js
 module.exports = {
     // 开发模式配置
@@ -89,9 +127,8 @@ webpack.base.dev.js
 webpack.base.prod.js  
 webpack.base.test.js  
 
-开发项目启动命令 *npm start* 或者 *npm run dev*；使用webpack.base.dev.js 配置
+开发项目启动命令 *npm start* 或者 *npm run dev*，使用webpack.base.dev.js 配置
 /package.json:
-
 ````js
 "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
@@ -102,5 +139,30 @@ webpack.base.test.js
 },
 ````
 
+### webpack编译生产包
+/build/build.js：
 
+```js
+const rm = require('rimraf')
+const config = require('../config')
+const webpack = require('webpack')
+const webpackConfig = require('./webpack.prod.conf')
+// 清空旧的静态文件；静态文件名称每次编译都会带上hash
+rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
+    // 导入生产配置
+    webpack(webpackConfig, (err, stats) => {})
+})
+```
 
+### 静态文件build后生成名称规则  
+/build/webpack.base.conf.js:
+```js
+{
+    test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+    loader: 'url-loader',
+    options: {
+      limit: 10000,
+      name: utils.assetsPath('img/[name].[hash:7].[ext]')
+    }
+}
+```
