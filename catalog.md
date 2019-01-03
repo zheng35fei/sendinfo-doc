@@ -16,6 +16,7 @@
     你必须使用绝对路径来引用这些文件。
     config/index.js 内配置了是否是static文件夹，可以通过修改配置改变静态文件夹的名称和位置
 
+/config/index.js：
 ```js
 assetsSubDirectory: 'static',
 assetsPublicPath: '/',

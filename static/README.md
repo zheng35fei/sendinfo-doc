@@ -39,7 +39,7 @@ data () {
 图片默认小于4kb的会被内联引入，以减少请求数；
 
 
-## 样式 CSS | sass
+## 样式 CSS (sass)
 /src/styles/..
 
 全局样式采用sass语法；  
@@ -104,10 +104,18 @@ src/icon/..:
 <i class="el-icon-my-user"></i>
 ```
 
-## js
-
+## 插件 js
+ /static/xxx/
+ 外部js插件等,可以存放cdn引入使用
 
 ## 图片
- /static/assets/images
- /src/assets/images
+ /src/assets/images/  
+页面中以模块方式引入
 
+```js
+require('/src/assets/images/a.jpg')
+```
+```html
+<img src="~assets/images/a.jpg">
+```
+ 

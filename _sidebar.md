@@ -1,8 +1,10 @@
-* [首页](/)
-* [配置](config.md)
-* [目录结构](catalog.md)
-* [静态资源](/static/)
-* [组件](/components/)
-* [路由](/router/)
-* [axios](/axios/)
-* [页面](/pages/)
+* 基础
+    * [首页](/)
+    * [配置](config.md)
+    * [目录结构](catalog.md)
+* 详细
+    * [静态资源](/static/)
+    * [路由](/router/)
+    * [axios](/axios/)
+    * [页面](/pages/)
+    * [组件](/components/)
