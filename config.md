@@ -57,7 +57,7 @@ created() {
 也可以修改接口，允许跨域请求的方式解决；
 
 ?> 跨域复杂请求先发起一个options请求，返回200会再发起一个正常的请求
-![跨域请求接口](/imgs/options.png ':size=518x189')
+![跨域请求接口](./imgs/options.png ':size=518x189')
 
 /config/index.js:
 ```js
@@ -118,7 +118,7 @@ module.exports = {
 
 ### Vue.js devtools插件(webkit内核和Firefox可安装)  
 [chrome网上应用地址](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)  
-![devTool](/imgs/devTool.png)
+![devTool](./imgs/devTool.png)
 
 
 ## webpack配置
