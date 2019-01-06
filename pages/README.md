@@ -1,3 +1,104 @@
+## 页面分布
+每个页面包含下面这些：
+
+* template 页面模板
+* script 页面局部vue实例
+* 页面样式
+
+* ` <style lang="scss" scoped>`  scoped 表示只在内部vue实例中生效
+
+
+```html
+<template></template>
+```
+
+### 页面vue实例
+
+```html
+<template>
+    <div>
+        <div class="filter-container">
+            <el-input @keyup.enter.native="handleFilter" style="width: 180px;" class="filter-item" placeholder="主题"
+                      v-model="paginations.searchData.title"></el-input>
+        </div>
+    </div>
+</template>
+
+<script >
+    export default {
+        data() {
+            return {
+                dataList: [],
+                deleteRows: [],
+                formData: Object.assign({}, tempformData), // copy obj
+                labels: tempLabels,
+                rules: {
+                    info: [
+                        {max: 512, message: '最大长度为 64', trigger: 'blur'},
+                        {required: true, message: '不为空', trigger: 'blur'},
+                    ],
+                },
+                //需要给分页组件传的信息
+                paginations: {
+                    currentPage: 1,
+                    total: 0,
+                    pageSize: 10,
+                    pageSizes: [10, 20, 30, 50],
+                    layout: 'total, sizes, prev, pager, next, jumper',
+                    searchData: {
+                        title: '',
+                        content: '',
+                        logLevel: '',
+                        startTime: DateUtil.prevDate(new Date(),3),
+                        endTime: '',
+                    },
+                },
+            }
+        }
+        components: {}, // 引入组件
+        created(){},    // 生命周期
+        watch: {},      // watch数据变化
+        methods: {      // 自定义方法
+            handleFilter() {
+                this.paginations.currentPage = 1;
+                this.getList()
+            },
+             getList() {
+                this.listLoading = true;
+                const data = {
+                    current: this.paginations.currentPage,
+                    size: this.paginations.pageSize,
+                    ...this.paginations.searchData,
+                    ...this.orders
+                };
+                this.$http.get('/api/sysOptLog/page', {params: data}).then(response => {
+                    this.dataList = response.data.records;
+                    this.paginations.total = response.data.total;
+                    this.listLoading = false;
+                });
+            },
+        }
+    }
+</script>
+```
+
+!> `template`下一级只能包含一个dom元素，否则会报错
+```js
+// 错误
+<template>
+    <div></div>
+    <div></div>
+</template>
+
+// 正确
+<template>
+    <div>
+        <div></div>
+        <div></div>
+    </div>
+</template>
+```
+
 ### 暂 访问根实例
 ```js
 // 获取根组件的数据
