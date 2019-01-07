@@ -199,6 +199,45 @@ export default {
   }
 }
 ```
+
+在项目内使用   
+/src/views/login.vue:
+`this.setToken(res.data)` 给vuex里的token赋值
+```js
+new vue({
+    methods: {
+        ...mapMutations([
+            'setToken',
+            'setUserInfo'
+        ]), 
+        handleSubmit() {
+            this.$refs['loginForm'].validate((valid) => {
+                if (valid) {
+                    let params = {
+                        ...this.form
+                    }
+                    params.password = util.encodeBase64(params.password)
+                    this.$http.post('/login', params).then(res => {
+                        if(res.success){
+                            this.setToken(res.data)
+                            this.$http.get('/api/userinfo').then(response => {
+                                this.setUserInfo(response.data);
+                                //动态添加路由
+                                const routes = this.$store.getters.getRoutes
+                                this.$router.addRoutes(routes);
+                                this.$router.push('/');
+                            })
+                        }
+                    }).catch(res=>{
+                        // 登录失败刷新验证码
+                        this.refreshCode();
+                    });
+                }
+            });
+        }
+    }
+})
+```
 [vuex-mutations官方文档](https://vuex.vuejs.org/zh/guide/mutations.html)
 
 ## actions

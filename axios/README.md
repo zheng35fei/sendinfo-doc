@@ -95,4 +95,31 @@ this.$http.get(url, {params, headers}).then( res => {})
 this.$http.post(url, params).then( res => {})
 ```
 
+axios返回的是一个promise对象，也可以:
+```js
+methdos: {
+    async login(){
+        const { data } = await this.$http.post(url, data);
+        console.log(data)
+    }
+}
+```
+异步的过程使用async和await可以变成同步流程执行，等待接口返回数据后再走到下一步；  
+如果有多个接口没有依赖关系,并发发起也可以使用axios.all：
+```js
+function getUserAccount() {
+  return axios.get('/user/12345');
+}
+
+function getUserPermissions() {
+  return axios.get('/user/12345/permissions');
+}
+
+axios.all([getUserAccount(), getUserPermissions()])
+.then(axios.spread(function (acct, perms) {
+console.log('两个请求都完成了')
+}));
+  
+```
+
 

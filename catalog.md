@@ -1,13 +1,5 @@
 # 目录结构
-```
-- src
-    \assets
-    \components
-    \core
-        
-        
-- static
-```
+![目录结构](./imgs/files.png) 
 
 
 ## 静态资源 static

@@ -1,7 +1,7 @@
 * 基础
-    * [首页](/)
-    * [配置](config.md)
     * [目录结构](catalog.md)
+    * [安装&运行](/env/)
+    * [配置](config.md)
 * 详细
     * [静态资源 static](/static/)
     * [路由 router](/router/)

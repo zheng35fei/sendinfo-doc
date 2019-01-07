@@ -1,10 +1,24 @@
 ## 配置文件 config
 
-### 环境参数配置文件
+### 运行端口
+/config/index.js:   
+配置host和port    
+```js
+dev:{
+    host: 'localhost', 
+    port: 8081, 
+}
+```
+
+### 环境参数、接口地址配置文件
 /config/dev.env.js  
 /config/prod.env.js  
 /config/test.env.js：  
 根据不同环境，写入项目接口地址、网关、环境、名称等配置   
+```js
+BASE_URL： 接口地址
+DEFAULT_GATEWAY： 接口网关
+```
 
 ```js
 {
