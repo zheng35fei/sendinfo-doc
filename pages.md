@@ -1,25 +1,23 @@
+# 页面
+描述了如何在页面中添加样式， 绑定动态数据、方法和vueJs在页面中的属性、计算属性、侦听器、生命周期等
 
-* template 页面模板
-* script 页面局部vue实例
-* 页面样式 `<style lang="scss" scoped>`  scoped 表示只在当前内部vue实例中生效
-
-### 样式
+## 样式
 `<style lang="scss" scoped>` 
 lang 表示是 哪一种类型的css 语法； 项目内使用sass, 也可以使用less、 css 、stylus等
 scoped 表示当前样式只在当前文档生效
 局部样式
 ```html
-<header data-v-8265a8dc="" class="el-header avue-tabs" style="height: auto;"></header>
+<header data-v-xxxxxxx="" class="el-header avue-tabs" style="height: auto;"></header>
 ```
 标签上会自动生成data-v-xxx，
 局部样式也会生成对应前缀
 ```css
-[data-v-xxx].customCssName {
+[data-v-xxxxxxx].customCssName {
     font-size:12px;
 }
 ```
 
-#### 局部样式覆盖全局样式、框架样式
+### 局部样式覆盖全局样式、框架样式
 在样式class前添加 `>>>` 符号, 并且用 `!important` 提升样式权重：
 ```css
 >>> .avue-tabs {
@@ -29,7 +27,21 @@ scoped 表示当前样式只在当前文档生效
 
 ?> 也可以不加scoped `<style></style>`  变成全局样式；但是由于各个模块的加载顺序问题，会导致污染别的不需要该样式的模块，或者被别的模块覆盖。
 
-### html
+## 页面数据绑定
+html中嵌套数据使用 `{{}}` 符号包裹, 如果需要不转化显示代码或图片等内容可在标签内使用`v-html`、`v-text`渲染；
+```html
+let price = 10.01
+let content = '<div><img src="aaa.jpg"></div>'
+
+<span>{{price}}</span>
+
+<span>￥{{price => 0 ? price : 0}}</span>
+
+<div class="contentWrap" v-html="content"></div>
+```
+
+
+登录页面：
 ```html
 <template>
     <div class="login" :style="{backgroundImage: 'url(' +loginBgImg + ')'}" @keydown.enter="handleSubmit">
@@ -89,7 +101,7 @@ scoped 表示当前样式只在当前文档生效
 </template>
 ```
 
-!> `template`下一级只能包含一个dom元素，否则会报错
+!> `template`下一级只能包含一个dom元素，否则会报错; 这个规则不包括组件的使用。
 ```js
 // 错误
 <template>
@@ -106,7 +118,160 @@ scoped 表示当前样式只在当前文档生效
 </template>
 ```
 
-### 页面vue实例
+### 绑定数据和方法
+`v-on(@)` 和 `v-bind(:)`  ()内缩写
+```js
+data(){
+    return {
+        imgUrl: '/imgs/logo.png'
+    }
+},
+methods: {
+    toLogin(){
+        // TODO
+    }
+}
+```
+
+```html
+<div @click="toLogin()">button</div>
+<div v-on.click="toLogin()">button</div>
+
+<img :src="imgUrl" alt="">
+<img v-bind.src="imgUrl" alt="">
+```
+
+一些简单方法也可以直接内联写在html标签内   
+```html
+<div @click="console.log(1)"></div>
+```
+
+#### 事件修饰符
+在事件处理程序中调用 `event.preventDefault()` 或 `event.stopPropagation()` 是非常常见的需求。尽管我们可以在方法中轻松实现这点，但更好的方式是：方法只有纯粹的数据逻辑，而不是去处理 DOM 事件细节。
+
+为了解决这个问题，Vue.js 为 `v-on` 提供了事件修饰符。之前提过，修饰符是由点开头的指令后缀来表示的。
+* `stop`
+* `prevent`
+* `capture`
+* `self`
+* `once`
+* `passive`
+
+```html
+<!-- 阻止单击事件继续传播 -->
+<a v-on:click.stop="doThis"></a>
+
+<!-- 提交事件不再重载页面 -->
+<form v-on:submit.prevent="onSubmit"></form>
+
+<!-- 修饰符可以串联 -->
+<a v-on:click.stop.prevent="doThat"></a>
+
+<!-- 只有修饰符 -->
+<form v-on:submit.prevent></form>
+
+<!-- 添加事件监听器时使用事件捕获模式 -->
+<!-- 即元素自身触发的事件先在此处理，然后才交由内部元素进行处理 -->
+<div v-on:click.capture="doThis">...</div>
+
+<!-- 只当在 event.target 是当前元素自身时触发处理函数 -->
+<!-- 即事件不是从内部元素触发的 -->
+<div v-on:click.self="doThat">...</div>
+```
+
+#### 按键修饰符、系统修饰键、鼠标按钮修饰符
+在监听键盘事件时，我们经常需要检查常见的键值。Vue 允许为 `v-on` 在监听键盘事件时添加按键修饰符：
+```js
+<!-- 只有在 `keyCode` 是 13 时调用 `vm.submit()` -->
+<input v-on:keyup.13="submit">
+```
+[查看按键修饰符具体文档](https://cn.vuejs.org/v2/guide/events.html#%E6%8C%89%E9%94%AE%E4%BF%AE%E9%A5%B0%E7%AC%A6)
+
+[查看系统修饰键具体文档](https://cn.vuejs.org/v2/guide/events.html#%E7%B3%BB%E7%BB%9F%E4%BF%AE%E9%A5%B0%E9%94%AE)
+
+### 数据遍历
+```js
+data() {
+    return {
+        List: [
+            {
+                name: 'aaa'
+            },
+            {
+                name: 'bbb'
+            }
+        ]
+    }
+},
+```
+```html
+<ul>
+    <li v-for="item in List" :key="item.id">{{item.name}}</li>
+</ul>
+```
+!> 遍历数据需要在遍历的标签上添加一个不重复的`key`属性，来确保每一条的唯一性
+
+### 动态添加class
+根据数据动态添加class
+`:class={className: Boolean}`, `:class`可以和`class`同时使用
+````html
+let isTotalPrice = true;
+
+<div :class="{total: isTotalPrice}" class="price"></div>
+
+<!--result-->
+<div class="price total"></div>
+````
+
+### 条件渲染
+`v-if v-else` 不同于 `v-show`, `if else`页面上不会生成对应标签
+```html
+<div v-if="isShowDiv"></div>
+<div v-else></div>
+```
+也可以在`template`上使用
+```html
+<template v-if="isShow"></template>
+<template v-else></template>
+```
+
+### 展示隐藏
+
+```html
+<!--<div stlye="display:none"></div>-->
+<div v-show="isShowDiv"></div>
+
+<!--div不渲染-->
+<div v-if="isShowDiv"></div>
+
+```
+
+### 双向绑定
+```js
+data(){
+    return {
+        inputValue: 1
+    }
+}
+```
+input的值是定义的inputValue,同时输入值也会改变inputValue
+```html
+<input type="text" v-model="inputValue">
+```
+
+### 获取页面元素
+```html
+<div ref="table"></div>
+<!--也可以给组件添加ref, 获取到的是组件实例对象-->
+<v-calender ref="calendar"></calender>
+
+```
+```js
+// 获取元素DOM后可以通过js方法操作他
+this.$refs.table
+```
+
+## 页面vue实例
 
 ```html
 <template>
@@ -176,16 +341,67 @@ scoped 表示当前样式只在当前文档生效
 </script>
 ```
 
+常用的生命周期钩子
 ### 生命周期
 ![生命周期](./../imgs/lifecycle.png)
 
 #### created
 进入页面通常在created中查询页面显示数据的接口
 
+#### mounted   
+`el` 被新创建的 `vm.$el` 替换，并挂载到实例上去之后调用该钩子。如果 root 实例挂载了一个文档内元素，当 `mounted` 被调用时 `vm.$el` 也在文档内。
+
+注意 `mounted` 不会承诺所有的子组件也都一起被挂载。如果你希望等到整个视图都渲染完毕，可以用 [vm.$nextTick](https://cn.vuejs.org/v2/api/#vm-nextTick) 替换掉 `mounted`：
+
 #### beforeDestory
 离开当前页面之前触发， 如当前页面存在定时器需要在这里清除
 
-### 计算属性
+
+### 属性 data
+可以在页面实例化时添加初始定义；    
+如页面遮罩`isShowMask`默认是`false`,默认隐藏状态；   
+或者`listData`:列表数据， 默认是空对象或数组，当接口返回数据后赋值给`listData`; `this.listData = res.data`
+
+```js
+new Vue({
+    data(){
+        return {
+            isShowMask: false,
+            isAdult: true,
+            sex: 'man',
+            userInfo: {
+                name: 'username',
+                age: 12
+            },
+            list: [{id:1, price:10}, {id:2, price:101}]
+        }
+    },
+})
+```
+当data中的数据发生变化时，视图会重新渲染； 如果计算属性中有依赖`data`中的值时，也会重新触发方法，生成新的结果；
+只有在实例被创建时，`data`中的属性才是响应式的。
+
+!>  如果要往data中的响应式属性添加默认新的属性时，需要使用`$set`方法插入。否则插入的属性不会是响应式的，不会触发视图的更新和计算属性的更新。
+```ue.set( target, key, value )```
+```js
+new vue({
+    data() {
+        return {
+            a: {
+                b: 1
+            }
+        }
+    }
+})
+this.$set(this.a, 'c', 2)
+// result
+a: {
+    b: 1,
+    c: 2
+}
+```
+
+### 计算属性 computed
 
 ```js
 new Vue({
@@ -272,7 +488,6 @@ export default {
         },
     }
 }
-
 ```
 
 官方文档例子
@@ -295,136 +510,48 @@ computed: {
 现在再运行 `vm.fullName = 'John Doe'` 时，*setter* 会被调用，`vm.firstName` 和 `vm.lastName` 也会相应地被更新。
 
 
+### 侦听器 watch
+虽然计算属性在大多数情况下更合适，但有时也需要一个自定义的侦听器。这就是为什么 Vue 通过 `watch` 选项提供了一个更通用的方法，来响应数据的变化。当需要在数据变化时执行异步或开销较大的操作时，这个方式是最有用的。
 
-
-### 绑定数据和方法
-?> `v-on` 和 `v-bind`  
-缩写 `@` 、 `:`  
 ```js
-data() {
-    return {
-        imgUrl: '/imgs/logo.png'
+new vue({
+    data() {
+        return {
+            listData: []
+        }
+    },
+    watch: {
+        'listData': function(newListData, oldListData) {
+            console.log(newListData)
+        }
     }
-},
-methods: {
-    toLogin(){
-        // TODO
+})
+```
+
+### 自定义方法 methods
+methods 将被混入到 Vue 实例中。可以直接通过 `VM` 实例访问这些方法，或者在指令表达式中使用。方法中的 `this` 自动绑定为 Vue 实例。
+```js
+new Vue({
+    // 在实例创建完成后，立即调用获取列表数据方法
+    created() {
+        this.getListData()  
+    },
+    methods: {
+        // 获取列表数据
+        getListData(){
+            const url = '/admin/role/list';
+            let params = {
+                page:1,
+                limit:10
+            };
+            this.$http.get(url, params).then( res => {
+                this.listData = res.rows;
+            })
+        },
+        // 可以显示遮罩层, 在html上绑定click方法
+        showMask() {
+            this.isShowMask = true;
+        }
     }
-}
+})
 ```
-
-```html
-<div @click="toLogin()">button</div>
-<div v-on.click="toLogin()">button</div>
-
-<img :src="imgUrl" alt="">
-<img v-bind.src="imgUrl" alt="">
-```
-
-### 数据遍历
-```js
-data() {
-    return {
-        List: [
-            {
-                name: 'aaa'
-            },
-            {
-                name: 'bbb'
-            }
-        ]
-    }
-},
-```
-```html
-<ul>
-    <li v-for="item in List">{{item.name}}</li>
-</ul>
-```
-
-### 条件渲染
-```html
-<div v-if="isShowDiv"></div>
-<div v-else></div>
-```
-
-### 展示隐藏
-```html
-<!--<div stlye="display:none"></div>-->
-<div v-show="isShowDiv"></div>
-
-<!--div不渲染-->
-<div v-if="isShowDiv"></div>
-
-```
-
-### 双向绑定
-```js
-data(){
-    return {
-        inputValue: 1
-    }
-}
-```
-input的值是定义的inputValue,同时输入值也会改变inputValue
-```html
-<input type="text" v-model="inputValue">
-```
-
-
-### 暂 访问根实例
-```js
-// 获取根组件的数据
-this.$root.foo
-
-// 写入根组件的数据
-this.$root.foo = 2
-
-// 访问根组件的计算属性
-this.$root.bar
-
-// 调用根组件的方法
-this.$root.baz()
-```
-
-### 暂 访问父实例
-```js
-// 获取根组件的数据
-this.$parent.foo
-```
-
-### 暂 依赖注入
-```html
-<google-map>
-  <google-map-region v-bind:shape="cityBoundaries">
-    <google-map-markers v-bind:places="iceCreamShops"></google-map-markers>
-  </google-map-region>
-</google-map>
-```
-
-[依赖注入](https://cn.vuejs.org/v2/guide/components-edge-cases.html#%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5
-)  
-在这个组件里，所有 <google-map> 的后代都需要访问一个 `getMap` 方法，以便知道要跟那个地图进行交互。不幸的是，使用 `$parent` 属性无法很好的扩展到更深层级的嵌套组件上。这也是依赖注入的用武之地，它用到了两个新的实例选项：`provide` 和 `inject`
-
-vue父内部实例中
-```js
-provide: function () {
-  return {
-    getMap: this.getMap
-  }
-}
-```
-
-vue父组件内部任意子级的实例中
-```js
-inject: ['getMap']
-```
-
-在任意子级的组件中都可以获取到暴露出来的方法。类似于`props`
-
-实际上，你可以把依赖注入看作一部分“大范围有效的 prop”，除了：
-
-* 祖先组件不需要知道哪些后代组件使用它提供的属性
-* 后代组件不需要知道被注入的属性来自哪里
-
-!> 然而，依赖注入还是有负面影响的。它将你的应用以目前的组件组织方式耦合了起来，使重构变得更加困难。同时所提供的属性是非响应式的。这是出于设计的考虑，因为使用它们来创建一个中心化规模化的数据跟使用 `$root` 做这件事都是不够好的。如果你想要共享的这个属性是你的应用特有的，而不是通用化的，或者如果你想在祖先组件中更新所提供的数据，那么这意味着你可能需要换用一个像 `Vuex` 这样真正的状态管理方案了。

@@ -1,5 +1,7 @@
 
-## 浏览器缓存 localStore
+## 浏览器缓存 localStorage、sessionStorage
+由于状态管理器会被刷新页面清除掉，页面上一些需要暂存的数据缓存交给了浏览器的sessionStorage和localStorage，根据不同情况选择使用。
+
 /src/core/localStore/index.js
 创建浏览器缓存方法；
 存于sessionStorage和localStorage;  
@@ -7,8 +9,8 @@ sessionStorage和localStorage的get、set、remove方法都是一样的
 
 ### 本地存储 webstorage
 
-!> sessionStorage在关闭网站或浏览器后会被删除。存放数据大小为一般为5MB,而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信
-localStorage数据会一直保存在硬盘中，除非用户在浏览器手动删除。存放数据大小为一般为5MB,而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信。
+!> **sessionStorage**在关闭网站或浏览器后会被删除。存放数据大小为一般为5MB,而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信   
+**localStorage**数据会一直保存在硬盘中，除非用户在浏览器手动删除。存放数据大小为一般为5MB,而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信。
 Firefox3.6以上、Chrome6以上、Safari 5以上、Pera10.50以上、IE8以上版本的浏览器支持sessionStorage与localStorage的使用
 
 #### 作用域不同
@@ -16,6 +18,9 @@ Firefox3.6以上、Chrome6以上、Safari 5以上、Pera10.50以上、IE8以上�
 
 
 ## 自定义指令 directives
+一些页面元素状态发生变化时触发的方法。如图片加载错误使用默认图片替换，输入框载入后自动焦点等情况。
+有几个状态钩子可选择`元素绑定、插入、更新、组件更新、解除绑定`。这些状态下可触发自定义的方法来改变元素
+
 全局自定义指令
 
 ```js
@@ -53,8 +58,10 @@ Vue.directive('defaultImg', {
 [vue官网-自定义指令](https://cn.vuejs.org/v2/guide/custom-directive.html)
 
 ## 过滤器 filters
-全局过滤器
+用来处理数据的显示格式、数据对应的状态，（如金额需要显示小数点后两位，订单状态需要转化成中文）等一些**数据和页面实际需要展示内容不一致**的情况；   
+可把一些常用的方法添加在全局filter中，这样在所有页面中都可以直接使用。
 
+全局过滤器：
 ```
 <div>{{ price | priceMin}}</div>
 ```
@@ -78,6 +85,11 @@ export default {
 [vue官网-自定义过滤器](https://cn.vuejs.org/v2/api/#Vue-filter)
 
 ## 混合 mixins
+把特定情况的vue实例合并到需要使用到这种情况的页面vue实例中；    
+这个特定情况的vue实例内可能包含了vue的生命周期、自定义方法等，和使用到的页面进行合并，就可以直接在页面上使用它定义过的所有方法。
+
+项目框架内就定义了一些全局混合和独立的混合（在需要是引入使用）， `node_modules/src/core/plugins/mixins`
+
 > 全局混合
 
 全局加载/mixins/base下的所有方法  
@@ -166,25 +178,6 @@ new Vue({
   created: function () {
     console.log(this.$options.customOption) // => 'foo'
   }
-})
-```
-也可以在methods方法内部调用别的方法
-```js
-new Vue({
-    el: '#app',
-    data(){
-        return {
-            
-        }
-    },
-    methods: {
-        a(){
-            this.b()
-        },
-        b() {
-            this.$options.methods.a()
-        }
-    }
 })
 ```
 

@@ -1,7 +1,8 @@
 ## 状态管理器
-通过接口查询到的用户信息，网站信息和一些默认全局设置都可以存在state中；  
-这样网站内部vue实例或者所有的子组件中都可以通过vuex去取到这些需要公用的信息。
-![vuex](./../imgs/vuex.png)
+由于vue内有很多组件嵌套、和路由跳转，想要在不同页面、不同组件获取一些公用的数据会比较麻烦，所有都会通过状态管理器去存取这些数据，方便公用数据的存取。但是注意浏览器刷新后不会保留这些数据，如想要刷新后仍能使用就需要存到[浏览器缓存](/plugins?id=浏览器缓存-localstorage、sessionstorage)中。   
+如通过接口查询到的用户信息，网站信息、token和一些默认全局设置都可以存在state中；  
+这样网站内部组件或者所有的子组件中都可以通过vuex去取到这些需要公用的信息。
+![vuex](./imgs/vuex.png)
 
 [vuex官方文档](https://vuex.vuejs.org/zh/)
 
@@ -108,7 +109,7 @@ state: {
 ```
 
 ## getter
-有时候我们需要从 store 中的 state 中派生出一些状态。
+有时候我们需要从 state 中派生出一些状态。类似vue中的`computed`计算属性
 
 例如state中有userinfo: 
 ```js
@@ -131,7 +132,10 @@ this.$store.getters.userAge // 10
 #### mapGetters 辅助函数
 `mapGetters` 辅助函数仅仅是将 store 中的 getter 映射到局部计算属性：
 
-```js
+```html
+<div>{{doneTodosCount}}</div>
+
+<script >
 import { mapGetters } from 'vuex'
 
 export default {
@@ -145,6 +149,7 @@ export default {
     ])
   }
 }
+</script>
 ```
 
 ## mutations
