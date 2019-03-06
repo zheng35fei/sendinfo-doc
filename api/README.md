@@ -1,27 +1,45 @@
 ## 通用列表 
-defaultTable
 
-```html
-<default-table :option="option"
-               :gridReqParmas="gridReqParmas"
-               :listUrl="manageApi.roleGrid"
-               :addUrl="manageApi.roleAdd"
-               :editUrl="manageApi.roleUpdate"
-               :delUrl="manageApi.role"
-               :isDeleteSelected="true"
->
-</default-table>
+### 列表引入使用
+采用mixin方式引入页面中混合；同一页面可以引入多个。相同数据页面中的优先级高于mixin里的定义的相同值，可以覆盖初始设置。
+
+
+```js
+import commonList from '@/mixin/common-list.js'
+import commonForm from '@/mixin/common-form.js'
+export default {
+    mixins: [commonList, commonForm]
+}
 ```
+
+### 表格配置
+common-list 自定义属性
 
 | 参数 | 类型 | 说明 | 默认值 |
 | --- | --- | --- | --- |
 | option |  Object | 表格配置数据，具体配置看下表option 表格配置; | {page: true,selection: true,showBorder: true,align:'center',menuAlign:'center',column:[]}|
-| gridReqParams | Object | 列表查询参数， 必需包含*page*、*limit* 当前页码和每页条数| {page: 1,limit: 10,sort: 'createTime', order: 'desc'}|
-| listUrl | String | 列表接口 | null |
+| currentObj | Object | 当前选中条的所有数据，在新增和编辑是提交的是这个对象| {}|
+| listData | Object | 接口返回的列表数据| {}|
+| listParmas | String | 列表查询参数， 必需包含*page*、*limit* 当前页码和每页条数 | {page: 1,limit: 10,sort: 'createTime',order: 'desc'} |
+| searchForm | String | 搜索框查询对象 | {}} |
+| selectedIds | String | 多选选中id；使用,分割 | '' |
+| addUrl | String | 列表接口 | null |
 | addUrl | String | 新增接口 | null |
 | editUrl | String | 编辑接口 | null|
-| delUrl | String | 删除接口 | null |
-| isDeleteSelected | Boolean | 是否显示全部删除按钮 | false|
+| delUrl | String | 删除接口，可传多个id，用逗号分隔；具体看接口要求 | null |
+
+common-list 方法
+| 方法名 | 说明 | 
+| --- | --- |
+| GetList | 获取列表数据 |
+| currentChange | 查询第N页数据 |
+|  sizeChange | 改变每页显示条数 |
+|  rowSave | 新增提交一条数据 |
+|  rowUpdate | 修改提交一条数据 |
+|  rowDel | 删除传入的id数据 |
+|  refresh | 刷新列表，会带上搜索栏内和分页数据重新查询 |
+|  searchChange | 根据搜索条件查询列表 |
+|  selectionChange | 根据选中的条数，给`selectedIds`赋值选中数据的id，以逗号分隔 |
 
 ### option 表格配置
 |参数	|说明	|类型	|可选值	|默认值|
@@ -75,4 +93,67 @@ defaultTable
 |cellBtn	|表格单元格可编辑（当 column 中有搜索的属性中有 cell 为 true 的属性启用，只对 type 为 select 和 input 有作用)	|Boolean	|true / false	|true|
 |selectClearBtn	|清空选中按钮（当 selection 为 true 起作用）	|Boolean	|true / false	|true|
 
-### column 表格展示字段配置
+### **（弃用）**defaultTable 采用组件方式生成表单列表 
+
+```html
+<default-table :option="option"
+               :gridReqParmas="gridReqParmas"
+               :listUrl="manageApi.roleGrid"
+               :addUrl="manageApi.roleAdd"
+               :editUrl="manageApi.roleUpdate"
+               :delUrl="manageApi.role"
+               :isDeleteSelected="true"
+>
+</default-table>
+```
+
+| 参数 | 类型 | 说明 | 默认值 |
+| --- | --- | --- | --- |
+| option |  Object | 表格配置数据，具体配置看下表option 表格配置; | {page: true,selection: true,showBorder: true,align:'center',menuAlign:'center',column:[]}|
+| gridReqParams | Object | 列表查询参数， 必需包含*page*、*limit* 当前页码和每页条数| {page: 1,limit: 10,sort: 'createTime', order: 'desc'}|
+| listUrl | String | 列表接口 | null |
+| addUrl | String | 新增接口 | null |
+| editUrl | String | 编辑接口 | null|
+| delUrl | String | 删除接口 | null |
+| isDeleteSelected | Boolean | 是否显示全部删除按钮 | false|
+
+
+## 通用表单
+
+### 表单混入使用
+采用mixin方式引入页面中混合；同一页面可以引入多个。相同数据页面中的优先级高于mixin里的定义的相同值，可以覆盖初始设置。
+
+
+```js
+import commonForm from '@/mixin/common-form.js'
+export default {
+    mixins: [commonForm]
+}
+```
+
+### 表单配置
+common-list 自定义属性
+
+| 参数 | 类型 | 说明 | 默认值 |
+| --- | --- | --- | --- |
+| formName |  String | 表单组件上自定义的名称**(ref=formName)** | 无 |
+| formId | Number | 列表页选中条数据的id| 0 |
+| form | Object | 表单数据，通常通过接口获取 | {}|
+| formDataKeys | Array | 如果接口返回数据不是在同一级下，嵌套在不同的子对象中，这里可以填写子对象名称，合并到同一个对象中使用 | [] |
+| isShowForm | Boolean | 显示隐藏弹出框 | false |
+| formOption | Object | 表单配置参数，内置的column配置显示哪些字段和对应的类型，下表详细 | {} |
+| formUrl | String | 表单详细接口 | '' |
+| formNewUrl | String | 表单新增页面查询接口 | '' |
+| formAddUrl | String | 表单新增页面提交保存接口 | '' |
+| formUpdateUrl | String | 表单编辑页面提交编辑接口 | '' |
+
+common-list 方法
+
+| 方法名 | 说明 |
+| --- | --- |
+| GetDetail | 获取表单数据 |
+| postForm | 提交表单数据 |
+|  resetForm | 清空表单 |
+|  showDialogForm | 打开表单弹出层 |
+
+[查看avue表单文档](https://avue.top/#/component/form-doc)
